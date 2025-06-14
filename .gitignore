@@ -30,6 +30,9 @@ playground.xcworkspace
 # .swiftpm
 
 .build/
+DerivedData
+.env
+Derived/
 
 # CocoaPods
 #
@@ -60,3 +63,16 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
+
+### Project
+*.xcodeproj
+*.xcworkspace
+*.xcuserdata
+*.xcshareddata
+*.xcuserstate
+*.xcuserdatad
+*.xcuserdata
+
+## Tuist
+Tuist/Dependencies/SwiftPackageManager
+Tuist/Dependencies/graph.json
