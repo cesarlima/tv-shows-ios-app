@@ -44,7 +44,7 @@ let template = Template(
         ),
         .file(
             path: "Modules/\(moduleName)/\(moduleName)Tests/ModuleTests.swift",
-            templatePath: "Tests/ModuleTests.swift"
+            templatePath: "Tests/ModuleTests.stencil"
         ),
         .file(
             path: "Modules/\(moduleName)/\(moduleName)Testing/ModuleTesting.swift",
