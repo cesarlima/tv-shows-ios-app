@@ -72,12 +72,9 @@ final class URLSessionHttpClientTests: XCTestCase {
     func test_perform_performsRequestUsingCorrectHTTPRequest() async {
         let request = GetRequestMock()
         let sut = URLSessionHttpClient()
-        
-        let mockData = Data("mock data".utf8)
-        let mockResponse = HTTPURLResponse(url: request.url, statusCode: 200, httpVersion: nil, headerFields: nil)
-        URLProtocolStub.stub(data: mockData, response: mockResponse, error: nil)
 
         let exp = expectation(description: "Wait for request")
+        URLProtocolStub.stub(data: makeValidData(), response: makeHTTPURLResponse(), error: nil)
         URLProtocolStub.observeRequest { receivedRequest in
             XCTAssertEqual(receivedRequest.url, request.url)
             XCTAssertEqual(receivedRequest.httpMethod, request.method.rawValue)
@@ -92,6 +89,14 @@ final class URLSessionHttpClientTests: XCTestCase {
 
         await fulfillment(of: [exp], timeout: 1)
     }
+}
+
+func makeValidData() -> Data {
+    return Data("{ \"id\": 1 }".utf8)
+}
+
+func makeHTTPURLResponse(statusCode: Int = 200, url: URL = URL(string: "https://a-url.com/path")!) -> HTTPURLResponse {
+    return HTTPURLResponse(url: url, statusCode: statusCode, httpVersion: nil, headerFields: nil)!
 }
 
 struct GetRequestMock: HTTPRequest {
