@@ -11,10 +11,10 @@ let project = Project(
     targets: [
         .target(
             name: "TVShowsApp",
-            destinations: [.mac, .iPhone],
+            destinations: .iOS,
             product: .app,
-            bundleId: "br.com.cesarlima.Network",
-            deploymentTargets: .multiplatform(macOS: "14.2"),
+            bundleId: "com.tvshowsapp.TVShowsApp",
+            deploymentTargets: .iOS("15.0"),
             infoPlist: .default,
             sources: ["TVShowsApp/Sources/**"],
             resources: ["Resources/**"],
@@ -22,14 +22,17 @@ let project = Project(
         ),
         .target(
             name: "TVShowsAppTests",
-            destinations: [.mac, .iPhone],
+            destinations: .iOS,
             product: .unitTests,
-            bundleId: "br.com.cesarlima.NetworkTests",
-            deploymentTargets: .multiplatform(macOS: "14.2"),
+            bundleId: "com.tvshowsapp.TVShowsAppTests",
+            deploymentTargets: .iOS("15.0"),
             infoPlist: .default,
             sources: ["TVShowsApp/Tests/**"],
             resources: [],
             dependencies: [.target(name: "TVShowsApp")]
         ),
+    ],
+    schemes: [
+        
     ]
 )
