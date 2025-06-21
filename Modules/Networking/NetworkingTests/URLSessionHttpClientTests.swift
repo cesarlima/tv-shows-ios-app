@@ -3,7 +3,53 @@ import Foundation
 @testable import Networking
 
 final class URLSessionHttpClient {
+    private let session: URLSession
+
+    init(session: URLSession = .shared) {
+        self.session = session
+    }
+
+    func perform(_ request: HTTPRequest) async throws {
+        (_, _) = try await session.data(for: request.asURLRequest())
+    }
+}
+
+protocol HTTPRequest {
+    var host: String { get }
+    var path: String { get }
+    var method: HTTPMethod { get }
+    var headers: [String: String] { get }
+    var body: HTTPBody { get }
+}
+
+extension HTTPRequest {
+    func asURLRequest() throws -> URLRequest {
+        var components = URLComponents()
+        components.scheme = "https"
+        components.host = host
+        components.path = path
+        var request = URLRequest(url: components.url!)
+        request.httpMethod = method.rawValue
+        request.allHTTPHeaderFields = headers
+        request.httpBody = try body.encode()
+        return request
+    }
+}
+
+struct HTTPBody {
+    let defaultHeaders: [String: String]
+    let encode: () throws -> Data
     
+    static func empty() -> HTTPBody {
+        return HTTPBody(defaultHeaders: [:], encode: { Data() })
+    }
+}
+
+enum HTTPMethod: String {
+    case get = "GET"
+    case post = "POST"
+    case put = "PUT"
+    case delete = "DELETE"
 }
 
 final class URLSessionHttpClientTests: XCTestCase {
@@ -21,6 +67,41 @@ final class URLSessionHttpClientTests: XCTestCase {
         _ = URLSessionHttpClient()
         
         XCTAssertEqual(URLProtocolStub.requestsCount, 0)
+    }
+
+    func test_perform_performsRequestUsingCorrectHTTPRequest() async {
+        let request = GetRequestMock()
+        let sut = URLSessionHttpClient()
+        
+        let mockData = Data("mock data".utf8)
+        let mockResponse = HTTPURLResponse(url: request.url, statusCode: 200, httpVersion: nil, headerFields: nil)
+        URLProtocolStub.stub(data: mockData, response: mockResponse, error: nil)
+
+        let exp = expectation(description: "Wait for request")
+        URLProtocolStub.observeRequest { receivedRequest in
+            XCTAssertEqual(receivedRequest.url, request.url)
+            XCTAssertEqual(receivedRequest.httpMethod, request.method.rawValue)
+            exp.fulfill()
+        }
+
+        do {
+            _ = try await sut.perform(request)
+        } catch {
+            XCTFail("Expected success, got \(error)")
+        }
+
+        await fulfillment(of: [exp], timeout: 1)
+    }
+}
+
+struct GetRequestMock: HTTPRequest {
+    var host: String = "a-url.com"
+    var path: String = "/path"
+    var method: HTTPMethod = .get
+    var headers: [String: String] = [:]
+    var body: HTTPBody = .empty()
+    var url: URL {
+        URL(string: "https://" + host + path)!
     }
 }
 
@@ -66,20 +147,22 @@ private class URLProtocolStub: URLProtocol {
         URLProtocolStub.requestsCount += 1
         
         if let requestObserver = URLProtocolStub.requestObserver {
-            client?.urlProtocolDidFinishLoading(self)
             requestObserver(request)
         }
         
-        if let data = URLProtocolStub.stub?.data {
-            client?.urlProtocol(self, didLoad: data)
-        }
-        
-        if let response = URLProtocolStub.stub?.response {
-            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
-        }
-        
-        if let error = URLProtocolStub.stub?.error {
-            client?.urlProtocol(self, didFailWithError: error)
+        if let stub = URLProtocolStub.stub {
+            if let response = stub.response {
+                client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+            }
+            
+            if let data = stub.data {
+                client?.urlProtocol(self, didLoad: data)
+            }
+            
+            if let error = stub.error {
+                client?.urlProtocol(self, didFailWithError: error)
+                return
+            }
         }
         
         client?.urlProtocolDidFinishLoading(self)
