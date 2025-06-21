@@ -9,20 +9,30 @@ final class URLSessionHttpClient {
         self.session = session
     }
 
-    func perform(_ request: HTTPRequest) async throws {
+    func perform(_ request: HTTPRequest) async throws -> HTTPResult {
         do {
-            let (_, response) = try await session.data(for: request.asURLRequest())
+            let (data, response) = try await session.data(for: request.asURLRequest())
             
-            if let httpResponse = response as? HTTPURLResponse,
-               !(200...299).contains(httpResponse.statusCode) {
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw URLError(.badServerResponse)
+            }
+            
+            if !(200...299).contains(httpResponse.statusCode) {
                 throw HTTPErrorMapper.mapHTTPResponse(httpResponse)
             }
+            
+            return HTTPResult(data: data, response: httpResponse)
         } catch let error as HTTPClientError {
             throw error
         } catch {
             throw HTTPErrorMapper.map(error, response: nil)
         }
     }
+}
+
+struct HTTPResult {
+    let data: Data
+    let response: HTTPURLResponse
 }
 
 protocol HTTPRequest {
@@ -195,7 +205,7 @@ final class URLSessionHttpClientTests: XCTestCase {
         URLProtocolStub.stub(data: nil, response: nil, error: makeError())
         
         do {
-            try await sut.perform(request)
+            _ = try await sut.perform(request)
             XCTFail("Expected error to be thrown")
         } catch {
             // Expected to throw an error
@@ -220,6 +230,22 @@ final class URLSessionHttpClientTests: XCTestCase {
         await assertFailedResponse(for: 999, expectedError: .unknown)
     }
     
+    func test_perform_completesWithHTTPResultOnSuccess() async {
+        let request = GetRequestMock()
+        let sut = URLSessionHttpClient()
+        let expectedData = makeValidData()
+        
+        URLProtocolStub.stub(data: expectedData, response: makeHTTPURLResponse(), error: nil)
+        
+        do {
+            let result = try await sut.perform(request)
+            XCTAssertEqual(result.data, expectedData)
+            XCTAssertEqual(result.response.url, request.url)
+        } catch {
+            XCTFail("Expected success, got \(error)")
+        }
+    }
+    
     private func assertFailedResponse(for statusCode: Int,
                                       expectedError: HTTPClientError,
                                       file: StaticString = #filePath,
@@ -231,7 +257,7 @@ final class URLSessionHttpClientTests: XCTestCase {
         URLProtocolStub.stub(data: nil, response: response, error: nil)
         
         do {
-            try await sut.perform(request)
+            _ = try await sut.perform(request)
             XCTFail("Expected error to be thrown", file: file, line: line)
         } catch let error as HTTPClientError {
             XCTAssertEqual(error, expectedError, file: file, line: line)
@@ -251,7 +277,7 @@ final class URLSessionHttpClientTests: XCTestCase {
         URLProtocolStub.stub(data: nil, response: nil, error: urlError)
         
         do {
-            try await sut.perform(request)
+            _ = try await sut.perform(request)
             XCTFail("Expected error to be thrown", file: file, line: line)
         } catch let error as HTTPClientError {
             XCTAssertEqual(error, expectedError, file: file, line: line)
