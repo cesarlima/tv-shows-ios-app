@@ -89,6 +89,24 @@ final class URLSessionHttpClientTests: XCTestCase {
 
         await fulfillment(of: [exp], timeout: 1)
     }
+    
+    func test_perform_failsOnHTTPClientCompletesWithAnError() async {
+        let request = GetRequestMock()
+        let sut = URLSessionHttpClient()
+   
+        URLProtocolStub.stub(data: nil, response: nil, error: makeError())
+        
+        do {
+            try await sut.perform(request)
+            XCTFail("Expected error to be thrown")
+        } catch {
+            // Expected to throw an error
+        }
+    }
+}
+
+func makeError() -> NSError {
+    return NSError(domain: "any error", code: 0)
 }
 
 func makeValidData() -> Data {
