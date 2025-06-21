@@ -3,8 +3,8 @@ import ProjectDescription
 // MARK: - Project Factory
 extension Project {
     /// Creates a standard TMA module project
-    static func tmaModule(
-        configuration: ModuleConfiguration,
+    public static func tmaModule(
+        configuration: CoreModuleConfiguration,
         additionalDependencies: [TargetDependency] = [],
         additionalSettings: SettingsDictionary = [:]
     ) -> Project {

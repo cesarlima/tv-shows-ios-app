@@ -12,7 +12,7 @@ extension Target {
     static func defaultTarget(
         name: String,
         bundleId: String,
-        sources: SourceFilesList = ["Sources/**"],
+        sources: SourceFilesList,
         resources: ResourceFileElements? = nil,
         product: Product,
         infoPlist: InfoPlist? = .default,
@@ -37,14 +37,15 @@ extension Target {
     static func framework(
         name: String,
         bundleId: String,
-        sources: SourceFilesList = ["Sources/**"],
+        sources: SourceFilesList? = nil,
         dependencies: [TargetDependency] = [],
         additionalSettings: SettingsDictionary = [:]
     ) -> Target {
+        let frameworkSources = sources ?? ["\(name)/**"]
         return .defaultTarget(
             name: name,
             bundleId: bundleId,
-            sources: sources,
+            sources: frameworkSources,
             product: .framework,
             dependencies: dependencies,
             additionalSettings: additionalSettings
@@ -61,7 +62,6 @@ extension Target {
         return .framework(
             name: name,
             bundleId: bundleId,
-            sources: ["Interface/**"],
             dependencies: dependencies,
             additionalSettings: additionalSettings
         )
@@ -77,7 +77,6 @@ extension Target {
         return .framework(
             name: name,
             bundleId: bundleId,
-            sources: ["Testing/**"],
             dependencies: [.target(name: interfaceTarget)],
             additionalSettings: additionalSettings
         )
@@ -100,7 +99,7 @@ extension Target {
         return .defaultTarget(
             name: name,
             bundleId: bundleId,
-            sources: ["Tests/**"],
+            sources: ["\(name)/**"],
             product: .unitTests,
             dependencies: testDependencies,
             additionalSettings: additionalSettings
