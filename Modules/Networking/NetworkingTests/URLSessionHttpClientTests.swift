@@ -10,7 +10,18 @@ final class URLSessionHttpClient {
     }
 
     func perform(_ request: HTTPRequest) async throws {
-        (_, _) = try await session.data(for: request.asURLRequest())
+        do {
+            let (_, response) = try await session.data(for: request.asURLRequest())
+            
+            if let httpResponse = response as? HTTPURLResponse,
+               !(200...299).contains(httpResponse.statusCode) {
+                throw HTTPErrorMapper.mapHTTPResponse(httpResponse)
+            }
+        } catch let error as HTTPClientError {
+            throw error
+        } catch {
+            throw HTTPErrorMapper.map(error, response: nil)
+        }
     }
 }
 
@@ -50,6 +61,93 @@ enum HTTPMethod: String {
     case post = "POST"
     case put = "PUT"
     case delete = "DELETE"
+}
+
+enum HTTPClientError: LocalizedError, Equatable {
+    case invalidURL
+    case networkError(underlying: Error)
+    case serverError(statusCode: Int)
+    case clientError(statusCode: Int)
+    case timeout
+    case noConnection
+    case unauthorized
+    case forbidden
+    case notFound
+    case internalServerError
+    case unknown
+    
+    var errorDescription: String? {
+        switch self {
+        case .invalidURL:
+            return "Invalid URL provided"
+        case .networkError(let underlying):
+            return "Network error: \(underlying.localizedDescription)"
+        case .serverError(let statusCode):
+            return "Server error with status code: \(statusCode)"
+        case .clientError(let statusCode):
+            return "Client error with status code: \(statusCode)"
+        case .timeout:
+            return "Request timed out"
+        case .noConnection:
+            return "No internet connection"
+        case .unauthorized:
+            return "Unauthorized access"
+        case .forbidden:
+            return "Access forbidden"
+        case .notFound:
+            return "Resource not found"
+        case .internalServerError:
+            return "Internal server error"
+        case .unknown:
+            return "Unknown error occurred"
+        }
+    }
+    
+    static func == (lhs: HTTPClientError, rhs: HTTPClientError) -> Bool {
+        return lhs.errorDescription == rhs.errorDescription
+    }
+}
+
+struct HTTPErrorMapper {
+    static func map(_ error: Error, response: URLResponse?) -> HTTPClientError {
+        // Handle URLSession errors
+        if let urlError = error as? URLError {
+            return mapURLError(urlError)
+        }
+        
+        // Handle other errors
+        return .networkError(underlying: error)
+    }
+    
+    private static func mapURLError(_ error: URLError) -> HTTPClientError {
+        switch error.code {
+        case .notConnectedToInternet, .networkConnectionLost:
+            return .noConnection
+        case .timedOut:
+            return .timeout
+        case .badURL, .unsupportedURL:
+            return .invalidURL
+        default:
+            return .networkError(underlying: error)
+        }
+    }
+    
+    static func mapHTTPResponse(_ response: HTTPURLResponse) -> HTTPClientError {
+        switch response.statusCode {
+        case 401:
+            return .unauthorized
+        case 403:
+            return .forbidden
+        case 404:
+            return .notFound
+        case 500...599:
+            return .internalServerError
+        case 400...499:
+            return .clientError(statusCode: response.statusCode)
+        default:
+            return .unknown
+        }
+    }
 }
 
 final class URLSessionHttpClientTests: XCTestCase {
@@ -101,6 +199,64 @@ final class URLSessionHttpClientTests: XCTestCase {
             XCTFail("Expected error to be thrown")
         } catch {
             // Expected to throw an error
+        }
+    }
+    
+    func test_perform_mapsURLErrorToDomainError() async {
+        await assertForURLError(with: .notConnectedToInternet, expectedError: .noConnection)
+        await assertForURLError(with: .networkConnectionLost, expectedError: .noConnection)
+        await assertForURLError(with: .badURL, expectedError: .invalidURL)
+        await assertForURLError(with: .unsupportedURL, expectedError: .invalidURL)
+        await assertForURLError(with: .timedOut, expectedError: .timeout)
+        await assertForURLError(with: .cancelled, expectedError: .networkError(underlying: URLError(.cancelled)))
+    }
+    
+    func test_perform_mapsHTTPStatusCodesToDomainErrors() async {
+        await assertFailedResponse(for: 404, expectedError: .notFound)
+        await assertFailedResponse(for: 401, expectedError: .unauthorized)
+        await assertFailedResponse(for: 403, expectedError: .forbidden)
+        await assertFailedResponse(for: 500, expectedError: .internalServerError)
+        await assertFailedResponse(for: 429, expectedError: .clientError(statusCode: 429))
+        await assertFailedResponse(for: 999, expectedError: .unknown)
+    }
+    
+    private func assertFailedResponse(for statusCode: Int,
+                                      expectedError: HTTPClientError,
+                                      file: StaticString = #filePath,
+                                      line: UInt = #line) async {
+        let request = GetRequestMock()
+        let sut = URLSessionHttpClient()
+        
+        let response = makeHTTPURLResponse(statusCode: statusCode)
+        URLProtocolStub.stub(data: nil, response: response, error: nil)
+        
+        do {
+            try await sut.perform(request)
+            XCTFail("Expected error to be thrown", file: file, line: line)
+        } catch let error as HTTPClientError {
+            XCTAssertEqual(error, expectedError, file: file, line: line)
+        } catch {
+            XCTFail("Expected HTTPClientError, got \(error)", file: file, line: line)
+        }
+    }
+    
+    private func assertForURLError(with errorCode: URLError.Code,
+                                   expectedError: HTTPClientError,
+                                   file: StaticString = #filePath,
+                                   line: UInt = #line) async {
+        let request = GetRequestMock()
+        let sut = URLSessionHttpClient()
+        
+        let urlError = URLError(errorCode)
+        URLProtocolStub.stub(data: nil, response: nil, error: urlError)
+        
+        do {
+            try await sut.perform(request)
+            XCTFail("Expected error to be thrown", file: file, line: line)
+        } catch let error as HTTPClientError {
+            XCTAssertEqual(error, expectedError, file: file, line: line)
+        } catch {
+            XCTFail("Expected HTTPClientError, got \(error)", file: file, line: line)
         }
     }
 }
