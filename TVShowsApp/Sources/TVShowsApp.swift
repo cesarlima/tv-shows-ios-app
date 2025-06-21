@@ -1,5 +1,10 @@
-import Foundation
+import SwiftUI
 
-public protocol ModuleInterface {
-    func start()
-} 
+@main
+struct TVShowsApp: App {
+    var body: some Scene {
+        WindowGroup {
+            Text("Hello World")
+        }
+    }
+}

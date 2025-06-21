@@ -1,0 +1,43 @@
+name: CI
+
+# Controls when the action will run. 
+# Triggers the workflow on pull request events but only for the master branch.
+on:
+  workflow_dispatch:
+
+  push:
+    branches: [ "main" ]
+    
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+
+    runs-on: macos-15
+
+    timeout-minutes: 15
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
+    - uses: jdx/mise-action@v2
+
+    - name: Set up Ruby
+      uses: actions/setup-ruby@v1
+      with:
+        ruby-version: 3.2.8
+
+    - name: Set up Fastlane
+      run: bundle install
+    
+    - name: Select Xcode
+      run: sudo xcode-select -switch /Applications/Xcode_16.3.app
+      
+    - name: Xcode version
+      run: /usr/bin/xcodebuild -version
+
+    - name: Run all tests
+      run: bundle exec fastlane run_all_tests
+      env:
+        TUIST_CONFIG_DIR: ${{ github.workspace }}/Tuist
