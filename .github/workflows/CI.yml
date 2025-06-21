@@ -3,6 +3,8 @@ name: CI
 # Controls when the action will run. 
 # Triggers the workflow on pull request events but only for the master branch.
 on:
+  workflow_dispatch:
+
   push:
     branches: [ "main" ]
     
@@ -18,6 +20,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
+    - name: Set up Ruby
+      uses: actions/setup-ruby@v1
+      with:
+        ruby-version: 3.3.6
+
+    - name: Set up Fastlane
+      run: bundle install
     
     - name: Select Xcode
       run: sudo xcode-select -switch /Applications/Xcode_16.3.app
