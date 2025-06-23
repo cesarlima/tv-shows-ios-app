@@ -9,5 +9,8 @@ let project = Project.tmaModule(
     configuration: configuration,
     additionalDependencies: [
         // Add module-specific dependencies here
+    ],
+    unitTestsDependencies: [
+        .target(name: "NetworkingInterface")
     ]
 )
