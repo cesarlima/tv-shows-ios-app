@@ -15,6 +15,7 @@ public protocol HTTPRequest {
     var method: HTTPMethod { get }
     var headers: [String: String] { get }
     var body: HTTPBody { get }
+    var queryParams: [String: String]? { get }
 }
 
 extension HTTPRequest {
@@ -23,10 +24,18 @@ extension HTTPRequest {
         components.scheme = scheme.rawValue
         components.host = host
         components.path = path
+        components.queryItems = queryParamsToQueryItems()
         var request = URLRequest(url: components.url!)
         request.httpMethod = method.rawValue
         request.allHTTPHeaderFields = headers
         request.httpBody = try body.encode()
         return request
     }
+    
+    private func queryParamsToQueryItems() -> [URLQueryItem]? {
+        return queryParams?.map { key, value in
+            URLQueryItem(name: key, value: value)
+        }
+    }
+    
 }
