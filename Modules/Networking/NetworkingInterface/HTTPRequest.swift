@@ -38,4 +38,15 @@ extension HTTPRequest {
         }
     }
     
+    public var scheme: HTTPScheme {
+        return .https
+    }
+
+    public var body: HTTPBody {
+        return .empty()
+    }
+    
+    public var queryParams: [String: String]? {
+        return nil
+    }
 }
