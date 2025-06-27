@@ -11,6 +11,7 @@ import Foundation
 public protocol HTTPRequest {
     var host: String { get }
     var path: String { get }
+    var scheme: HTTPScheme { get }
     var method: HTTPMethod { get }
     var headers: [String: String] { get }
     var body: HTTPBody { get }
@@ -19,7 +20,7 @@ public protocol HTTPRequest {
 extension HTTPRequest {
     public func asURLRequest() throws -> URLRequest {
         var components = URLComponents()
-        components.scheme = "https"
+        components.scheme = scheme.rawValue
         components.host = host
         components.path = path
         var request = URLRequest(url: components.url!)
