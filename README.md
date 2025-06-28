@@ -7,6 +7,46 @@
 
 A comprehensive iOS application demonstrating enterprise-level development practices and architectural patterns designed for large-scale team collaboration. This project serves as a practical implementation of industry best practices, showcasing advanced iOS development methodologies essential for building robust, maintainable, and scalable mobile applications.
 
+## **Build and Run**
+
+### Prerequisites
+- Xcode 16.0 or later
+- iOS 15.0+ deployment target
+- [Tuist](https://docs.tuist.dev/en/) installed
+
+### Setup Instructions
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/cesarlima/tv-shows-ios-app.git
+   cd tv-shows-ios-app
+   ```
+
+2. **Install Tuist (if not already installed)**
+   [Tuist Documentation](https://docs.tuist.dev/en/guides/quick-start/install-tuist)
+
+3. **Generate the Xcode project**
+   ```bash
+   tuist generate
+   ```
+
+4. **Open the workspace**
+   ```bash
+   open TVShowsApp.xcworkspace
+   ```
+
+5. **Build and run**
+   - Select your target device or simulator
+   - Press `Cmd + R` or click the Run button in Xcode
+
+### Running Tests
+```bash
+tuist test
+```
+
+Or run tests directly in Xcode:
+- Press `Cmd + U` to run all tests
+- Use the Test navigator to run specific test suites
+
 ## **Technical Objectives**
 This project was architected to demonstrate proficiency in critical areas of modern iOS development:
 ### **Enterprise Development Practices**
@@ -28,6 +68,6 @@ This project was architected to demonstrate proficiency in critical areas of mod
 
 **Core Technologies**: Swift, SwiftUI, Combine, Swift Concurrency  
 **Architecture**: Clean Architecture, MVVM, Coordinator Pattern  
-**Tools**: Tuist, Xcode, Git, Fastlane  
+**Tools**: [Tuist](https://docs.tuist.dev/en/), Xcode, Git, Fastlane  
 **Testing**: XCTest
 **CI/CD**: GitHub Actions
