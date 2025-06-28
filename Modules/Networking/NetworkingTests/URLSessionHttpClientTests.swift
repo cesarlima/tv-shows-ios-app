@@ -130,16 +130,3 @@ final class URLSessionHttpClientTests: XCTestCase {
         }
     }
 }
-
-func makeError() -> NSError {
-    return NSError(domain: "any error", code: 0)
-}
-
-func makeValidData() -> Data {
-    return Data("{ \"id\": 1 }".utf8)
-}
-
-func makeHTTPURLResponse(statusCode: Int = 200, url: URL = URL(string: "https://a-url.com/path")!) -> HTTPURLResponse {
-    return HTTPURLResponse(url: url, statusCode: statusCode, httpVersion: nil, headerFields: nil)!
-}
-
