@@ -1,6 +1,7 @@
 import XCTest
 import Foundation
 import NetworkingInterface
+import NetworkingTesting
 @testable import Networking
 
 final class URLSessionHttpClientTests: XCTestCase {
@@ -21,7 +22,7 @@ final class URLSessionHttpClientTests: XCTestCase {
     }
 
     func test_perform_performsRequestUsingCorrectHTTPRequest() async {
-        let request = GetRequestMock()
+        let request = RequestMock()
         let sut = URLSessionHttpClient()
 
         let exp = expectation(description: "Wait for request")
@@ -42,7 +43,7 @@ final class URLSessionHttpClientTests: XCTestCase {
     }
     
     func test_perform_failsOnHTTPClientCompletesWithAnError() async {
-        let request = GetRequestMock()
+        let request = RequestMock()
         let sut = URLSessionHttpClient()
    
         URLProtocolStub.stub(data: nil, response: nil, error: makeError())
@@ -74,7 +75,7 @@ final class URLSessionHttpClientTests: XCTestCase {
     }
     
     func test_perform_completesWithHTTPResultOnSuccess() async {
-        let request = GetRequestMock()
+        let request = RequestMock()
         let sut = URLSessionHttpClient()
         let expectedData = makeValidData()
         
@@ -93,7 +94,7 @@ final class URLSessionHttpClientTests: XCTestCase {
                                       expectedError: HTTPClientError,
                                       file: StaticString = #filePath,
                                       line: UInt = #line) async {
-        let request = GetRequestMock()
+        let request = RequestMock()
         let sut = URLSessionHttpClient()
         
         let response = makeHTTPURLResponse(statusCode: statusCode)
@@ -113,7 +114,7 @@ final class URLSessionHttpClientTests: XCTestCase {
                                    expectedError: HTTPClientError,
                                    file: StaticString = #filePath,
                                    line: UInt = #line) async {
-        let request = GetRequestMock()
+        let request = RequestMock()
         let sut = URLSessionHttpClient()
         
         let urlError = URLError(errorCode)
@@ -140,17 +141,6 @@ func makeValidData() -> Data {
 
 func makeHTTPURLResponse(statusCode: Int = 200, url: URL = URL(string: "https://a-url.com/path")!) -> HTTPURLResponse {
     return HTTPURLResponse(url: url, statusCode: statusCode, httpVersion: nil, headerFields: nil)!
-}
-
-struct GetRequestMock: HTTPRequest {
-    var host: String = "a-url.com"
-    var path: String = "/path"
-    var method: HTTPMethod = .get
-    var headers: [String: String] = [:]
-    var body: HTTPBody = .empty()
-    var url: URL {
-        URL(string: "https://" + host + path)!
-    }
 }
 
 private class URLProtocolStub: URLProtocol {
