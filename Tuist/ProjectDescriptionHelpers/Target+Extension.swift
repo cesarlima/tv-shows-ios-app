@@ -56,8 +56,8 @@ extension Target {
     static func interface(
         name: String,
         bundleId: String,
-        additionalSettings: SettingsDictionary = [:],
-        dependencies: [TargetDependency] = []
+        dependencies: [TargetDependency] = [],
+        additionalSettings: SettingsDictionary = [:]
     ) -> Target {
         return .framework(
             name: name,
@@ -88,8 +88,8 @@ extension Target {
         bundleId: String,
         implementationTarget: String,
         testingTarget: String,
-        additionalSettings: SettingsDictionary = [:],
-        dependencies: [TargetDependency] = []
+        dependencies: [TargetDependency] = [],
+        additionalSettings: SettingsDictionary = [:]
     ) -> Target {
         let testDependencies = dependencies + [
             .target(name: implementationTarget),

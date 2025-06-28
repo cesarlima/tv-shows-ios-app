@@ -6,6 +6,8 @@ extension Project {
     public static func tmaModule(
         configuration: CoreModuleConfiguration,
         additionalDependencies: [TargetDependency] = [],
+        interfaceDependencies: [TargetDependency] = [],
+        unitTestsDependencies: [TargetDependency] = [],
         additionalSettings: SettingsDictionary = [:]
     ) -> Project {
         let targets = [
@@ -21,6 +23,7 @@ extension Project {
             Target.interface(
                 name: configuration.interfaceName,
                 bundleId: configuration.interfaceBundleId,
+                dependencies: interfaceDependencies,
                 additionalSettings: additionalSettings
             ),
             
@@ -38,6 +41,7 @@ extension Project {
                 bundleId: configuration.testsBundleId,
                 implementationTarget: configuration.name,
                 testingTarget: configuration.testingName,
+                dependencies: unitTestsDependencies,
                 additionalSettings: additionalSettings
             )
         ]
