@@ -19,6 +19,18 @@ public protocol HTTPRequest {
 }
 
 extension HTTPRequest {
+    public var scheme: HTTPScheme {
+        return .https
+    }
+
+    public var body: HTTPBody {
+        return .empty()
+    }
+    
+    public var queryParams: [String: String]? {
+        return nil
+    }
+    
     public func asURLRequest() throws -> URLRequest {
         var components = URLComponents()
         components.scheme = scheme.rawValue
@@ -36,17 +48,5 @@ extension HTTPRequest {
         return queryParams?.map { key, value in
             URLQueryItem(name: key, value: value)
         }
-    }
-    
-    public var scheme: HTTPScheme {
-        return .https
-    }
-
-    public var body: HTTPBody {
-        return .empty()
-    }
-    
-    public var queryParams: [String: String]? {
-        return nil
     }
 }
