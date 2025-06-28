@@ -11,12 +11,10 @@ import NetworkingInterface
 
 struct HTTPErrorMapper {
     static func map(_ error: Error, response: URLResponse?) -> HTTPClientError {
-        // Handle URLSession errors
         if let urlError = error as? URLError {
             return mapURLError(urlError)
         }
         
-        // Handle other errors
         return .networkError(underlying: error)
     }
     
