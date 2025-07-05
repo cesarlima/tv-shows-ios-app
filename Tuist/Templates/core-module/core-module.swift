@@ -17,7 +17,7 @@ let template = Template(
     ],
     items: [
         .string(
-            path: "Modules/\(moduleName)/Project.swift",
+            path: "Modules/Core/\(moduleName)/Project.swift",
             contents: """
             import ProjectDescription
             import ProjectDescriptionHelpers
@@ -35,19 +35,19 @@ let template = Template(
             """
         ),
         .file(
-            path: "Modules/\(moduleName)/\(moduleName)/Module.swift",
+            path: "Modules/Core/\(moduleName)/\(moduleName)/Module.swift",
             templatePath: "Sources/Module.swift"
         ),
         .file(
-            path: "Modules/\(moduleName)/\(moduleName)Interface/ModuleInterface.swift",
+            path: "Modules/Core/\(moduleName)/\(moduleName)Interface/ModuleInterface.swift",
             templatePath: "Interface/ModuleInterface.swift"
         ),
         .file(
-            path: "Modules/\(moduleName)/\(moduleName)Tests/ModuleTests.swift",
+            path: "Modules/Core/\(moduleName)/\(moduleName)Tests/ModuleTests.swift",
             templatePath: "Tests/ModuleTests.stencil"
         ),
         .file(
-            path: "Modules/\(moduleName)/\(moduleName)Testing/ModuleTesting.swift",
+            path: "Modules/Core/\(moduleName)/\(moduleName)Testing/ModuleTesting.swift",
             templatePath: "Testing/ModuleTesting.swift"
         )
     ]
