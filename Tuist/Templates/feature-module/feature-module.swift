@@ -18,7 +18,7 @@ let template = Template(
     items: [
         // Project configuration
         .string(
-            path: "Features/\(featureName)/Project.swift",
+            path: "Modules/Features/\(featureName)/Project.swift",
             contents: """
             import ProjectDescription
             import ProjectDescriptionHelpers
@@ -47,39 +47,39 @@ let template = Template(
         
         // Domain Layer
         .file(
-            path: "Features/\(featureName)/\(featureName)Domain/\(featureName)Domain.swift",
+            path: "Modules/Features/\(featureName)/\(featureName)Domain/\(featureName)Domain.swift",
             templatePath: "Domain/FeatureDomain.stencil"
         ),
         
         // Data Layer
         .file(
-            path: "Features/\(featureName)/\(featureName)Data/\(featureName)Repository.swift",
+            path: "Modules/Features/\(featureName)/\(featureName)Data/\(featureName)Repository.swift",
             templatePath: "Data/FeatureRepository.stencil"
         ),
         
         // Presentation Layer
         .file(
-            path: "Features/\(featureName)/\(featureName)/\(featureName)ViewModel.swift",
+            path: "Modules/Features/\(featureName)/\(featureName)/\(featureName)ViewModel.swift",
             templatePath: "Presentation/FeatureViewModel.stencil"
         ),
         
         // Testing Layer
         .file(
-            path: "Features/\(featureName)/\(featureName)Testing/\(featureName)Testing.swift",
+            path: "Modules/Features/\(featureName)/\(featureName)Testing/\(featureName)Testing.swift",
             templatePath: "Testing/FeatureTesting.stencil"
         ),
         
         // Test files
         .file(
-            path: "Features/\(featureName)/\(featureName)DomainTests/\(featureName)DomainTests.swift",
+            path: "Modules/Features/\(featureName)/\(featureName)DomainTests/\(featureName)DomainTests.swift",
             templatePath: "Tests/DomainTests.stencil"
         ),
         .file(
-            path: "Features/\(featureName)/\(featureName)DataTests/\(featureName)DataTests.swift",
+            path: "Modules/Features/\(featureName)/\(featureName)DataTests/\(featureName)DataTests.swift",
             templatePath: "Tests/DataTests.stencil"
         ),
         .file(
-            path: "Features/\(featureName)/\(featureName)Tests/\(featureName)Tests.swift",
+            path: "Modules/Features/\(featureName)/\(featureName)Tests/\(featureName)Tests.swift",
             templatePath: "Tests/PresentationTests.stencil"
         )
     ]
