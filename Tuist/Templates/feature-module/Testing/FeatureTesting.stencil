@@ -1,0 +1,13 @@
+//
+//  {{ name }}Testing.swift
+//  {{ name }}Testing
+//
+//  Created by Cesar Lima on {{ date }}.
+//
+
+import Foundation
+import {{ name }}Domain
+
+public final class {{ name }}RepositorySpy {
+
+}

@@ -1,0 +1,20 @@
+//
+//  {{ name }}Tests.swift
+//  {{ name }}Tests
+//
+//  Created by Cesar Lima on {{ date }}.
+//
+
+import XCTest
+@testable import {{ name }}
+import {{ name }}Domain
+import {{ name }}Testing
+
+final class {{ name }}PresentationTests: XCTestCase {
+    
+    // MARK: - Tests
+    
+    func test_() {
+        XCTAssertTrue(true)
+    }
+} 
