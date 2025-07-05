@@ -8,17 +8,31 @@
 import ProjectDescription
 
 extension Scheme {
-    /// Creates a standard scheme for a module
+      /// Creates a scheme for a module with test targets
+    static func module(
+        name: String,
+        implementationTarget: String,
+        testTargets: [String]
+    ) -> Scheme {
+        let testableTargets = testTargets.map { TestableTarget.testableTarget(target: TargetReference.target($0)) }
+        return .scheme(
+            name: name,
+            buildAction: .buildAction(targets: [TargetReference.target(implementationTarget)]),
+            testAction: .targets(testableTargets),
+            runAction: .runAction(executable: TargetReference.target(implementationTarget))
+        )
+    }
+    
+    /// Convenience function for a module with a single test target
     static func module(
         name: String,
         implementationTarget: String,
         testsTarget: String
     ) -> Scheme {
-        return .scheme(
+        return module(
             name: name,
-            buildAction: .buildAction(targets: [.target(implementationTarget)]),
-            testAction: .targets([.testableTarget(target: .target(testsTarget))]),
-            runAction: .runAction(executable: .target(implementationTarget))
+            implementationTarget: implementationTarget,
+            testTargets: [testsTarget]
         )
     }
 }

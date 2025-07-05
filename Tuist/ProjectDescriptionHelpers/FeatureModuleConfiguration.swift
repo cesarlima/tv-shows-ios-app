@@ -122,7 +122,7 @@ extension Project {
         
         let schemes = [
             // Main scheme that runs all tests
-            Scheme.feature(
+            Scheme.module(
                 name: configuration.name,
                 implementationTarget: configuration.name,
                 testTargets: [
