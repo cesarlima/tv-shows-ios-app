@@ -1,0 +1,17 @@
+//
+//  {{ name }}DataTests.swift
+//  {{ name }}DataTests
+//
+//  Created by Cesar Lima on {{ date }}.
+//
+
+import XCTest
+@testable import {{ name }}Data
+import {{ name }}Testing
+
+final class {{ name }}DataTests: XCTestCase {
+    
+    func test_() {
+        XCTAssertTrue(true)
+    }
+} 

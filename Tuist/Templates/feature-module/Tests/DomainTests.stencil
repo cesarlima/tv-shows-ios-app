@@ -1,0 +1,16 @@
+//
+//  {{ name }}DomainTests.swift
+//  {{ name }}DomainTests
+//
+//  Created by Cesar Lima on {{ date }}.
+//
+
+import XCTest
+@testable import {{ name }}Domain
+
+final class {{ name }}DomainTests: XCTestCase {
+
+    func test_() {
+        XCTAssertTrue(true)
+    }
+} 

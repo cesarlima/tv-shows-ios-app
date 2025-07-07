@@ -1,0 +1,14 @@
+//
+//  {{ name }}ViewModel.swift
+//  {{ name }}
+//
+//  Created by Cesar Lima on {{ date }}.
+//
+
+import SwiftUI
+import {{ name }}Domain
+
+@MainActor
+public final class {{ name }}ViewModel: ObservableObject {
+
+} 

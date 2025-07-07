@@ -1,0 +1,12 @@
+//
+//  {{ name }}Domain.swift
+//  {{ name }}Domain
+//
+//  Created by Cesar Lima on {{ date }}.
+//
+
+import Foundation
+
+public struct {{ name }}Entity {
+    
+}

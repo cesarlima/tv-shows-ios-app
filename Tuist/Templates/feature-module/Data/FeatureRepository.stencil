@@ -1,0 +1,12 @@
+//
+//  {{ name }}Repository.swift
+//  {{ name }}Data
+//
+//  Created by Cesar Lima on {{ date }}.
+//
+
+import Foundation
+
+public final class {{ name }}Repository {
+
+} 
